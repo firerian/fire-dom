@@ -141,7 +141,7 @@
       /* *************************
        *
        * nodeType                                    value            meanning
-          Node.ELEMENT_NODE                        1            Element    代表元素
+          Node.ELEMENT_NODE                            1            Element    代表元素
           Node.ATTRIBUTE_NODE                        2            Attr    代表属性
           Node.TEXT_NODE                            3            Text    代表元素或属性中的文本内容
           Node.CDATA_SECTION_NODE                    4            CDATASection    代表文档中的 CDATA 部（不会由解析器解析的文本）
@@ -153,7 +153,7 @@
           Node.DOCUMENT_TYPE_NODE                    10            DocumentType    向为文档定义的实体提供接口
           Node.DOCUMENT_FRAGMENT_NODE                11            DocumentFragment    代表轻量级的 Document 对象（文档的某个部分）
           Node.NOTATION_NODE                        12            Notation    代表 DTD 中声明的符号
-       **************************************
+       **************************************************************************************************
        */
 
       var nodetype = dom.nodeType;
@@ -287,11 +287,15 @@
       value: function attr(key, val) {
         if (val == null) {
           // 获取值
-          return this[0].getAttribute(key);
+          return this[0].getAttribute ? this[0].getAttribute(key) : this[0][key];
         } else {
           // 设置值
           return this.forEach(function (elem) {
-            elem.setAttribute(key, val);
+            if (elem.setAttribute) {
+              elem.setAttribute(key, val);
+            } else {
+              elem[key] = val;
+            }
           });
         }
       }
@@ -359,7 +363,14 @@
         } else {
           var currentStyle = "".concat(key, ":").concat(val, ";");
           return this.forEach(function (elem) {
-            var style = (elem.getAttribute('style') || '').trim();
+            var style;
+
+            if (elem.getAttribute) {
+              style = (elem.getAttribute('style') || "").trim();
+            } else {
+              style = (elem["style"] || "").trim();
+            }
+
             var styleArr,
                 resultArr = [];
 
@@ -390,10 +401,17 @@
               } // 结果
 
 
-              elem.setAttribute('style', resultArr.join('; '));
+              if (elem.setAttribute) {
+                elem.setAttribute('style', resultArr.join('; '));
+              } else {
+                elem["style"] = resultArr.join('; ');
+              }
             } else {
-              // style 无值
-              elem.setAttribute('style', currentStyle);
+              if (elem.setAttribute) {
+                elem.setAttribute('style', currentStyle);
+              } else {
+                elem["style"] = currentStyle;
+              }
             }
           });
         }
@@ -524,7 +542,6 @@
     return new domFn(dom);
   }
 
-  // import Editor from "./editor/index.js";
   var index = window.$ || $;
 
   return index;

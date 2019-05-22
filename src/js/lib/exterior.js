@@ -16,8 +16,6 @@ if (!document.querySelectorAll) {
         return elements;
     };
 }
-
-
 let f = {
 	// 添加元素事件
 	event(type,selector,fn){

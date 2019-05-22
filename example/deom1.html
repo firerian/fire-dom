@@ -2,15 +2,23 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+		<script src="es5-shim.min.js"></script>
+	<script src="es5-sham.min.js"></script>
 	<script src="../release/js/fire-dom.js" type="text/javascript" charset="utf-8"></script>
 	<title>Document</title>
 </head>
 <body>
+	<div id="xx"></div>
+
+
 	<script>
 		window.onload = function(){
 			var $ = window.$ || $;
-			console.log($)
-			console.log($("<p>12312</p>"))
+			$("#xx").css("width","300px")
+					.css("height","200px")
+					.css("background-color","#fd5a5a")
+					.html("123")
+
 		}
 	</script>
 </body>

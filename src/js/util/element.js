@@ -18,7 +18,7 @@ class domFn{
         /* *************************
          *
          * nodeType                                    value            meanning
-            Node.ELEMENT_NODE                        1            Element    代表元素
+            Node.ELEMENT_NODE                            1            Element    代表元素
             Node.ATTRIBUTE_NODE                        2            Attr    代表属性
             Node.TEXT_NODE                            3            Text    代表元素或属性中的文本内容
             Node.CDATA_SECTION_NODE                    4            CDATASection    代表文档中的 CDATA 部（不会由解析器解析的文本）
@@ -30,7 +30,7 @@ class domFn{
             Node.DOCUMENT_TYPE_NODE                    10            DocumentType    向为文档定义的实体提供接口
             Node.DOCUMENT_FRAGMENT_NODE                11            DocumentFragment    代表轻量级的 Document 对象（文档的某个部分）
             Node.NOTATION_NODE                        12            Notation    代表 DTD 中声明的符号
-         **************************************
+         **************************************************************************************************
          */
         const nodetype = dom.nodeType
         let selectorResult = []
@@ -145,11 +145,15 @@ class domFn{
     attr(key, val){
         if (val == null) {
             // 获取值
-            return this[0].getAttribute(key)
+            return this[0].getAttribute?this[0].getAttribute(key):this[0][key]
         } else {
             // 设置值
             return this.forEach(elem => {
-                elem.setAttribute(key, val)
+                if(elem.setAttribute){
+                    elem.setAttribute(key, val)
+                }else{
+                     elem[key] = val
+                }
             })
         }
     }
@@ -212,7 +216,14 @@ class domFn{
          }else{
              const currentStyle = `${key}:${val};`
              return this.forEach(elem => {
-                    const style = (elem.getAttribute('style') || '').trim()
+                     let style ;
+                     if(elem.getAttribute){
+                         style = (elem.getAttribute('style')||"").trim();
+                     }else{
+                        style = (elem["style"]||"").trim();
+                     }
+                        
+                   
                     let styleArr, resultArr = []
                     if (style) {
                         // 将 style 按照 ; 拆分为数组
@@ -238,10 +249,18 @@ class domFn{
                             resultArr.push(currentStyle)
                         }
                         // 结果
-                        elem.setAttribute('style', resultArr.join('; '))
+                        if( elem.setAttribute){
+                             elem.setAttribute('style', resultArr.join('; '))
+                         }else{
+                             elem["style"] = resultArr.join('; ')
+                         }
+                       
                     } else {
-                        // style 无值
-                        elem.setAttribute('style', currentStyle)
+                        if( elem.setAttribute){
+                             elem.setAttribute('style', currentStyle)
+                         }else{
+                             elem["style"] = currentStyle
+                         }
                     }
                 })
          }
@@ -341,10 +360,6 @@ class domFn{
         return this
     }
 }
-
-
-
-
 function $(dom) {
     return new domFn(dom)
 }
