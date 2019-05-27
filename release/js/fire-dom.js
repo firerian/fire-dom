@@ -115,6 +115,18 @@
       }
 
       return false;
+    },
+    UA: {
+      _ua: navigator.userAgent,
+      // 是否 webkit
+      isWebkit: function isWebkit() {
+        var reg = /webkit/i;
+        return reg.test(this._ua);
+      },
+      // 是否 IE
+      isIE: function isIE() {
+        return 'ActiveXObject' in window;
+      }
     }
   };
 
@@ -302,10 +314,8 @@
     }, {
       key: "append",
       value: function append($children) {
-        console.log($children);
         return this.forEach(function (elem) {
           $children.forEach(function (child) {
-            console.log(child);
             elem.appendChild(child);
           });
         });
@@ -338,6 +348,61 @@
             elem.className = className;
           }
         });
+      } // parentUntil 找到符合 selector 的父节点
+
+    }, {
+      key: "parentUntil",
+      value: function parentUntil(selector, _currentElem) {
+        var results = document.querySelectorAll(selector);
+        var length = results.length;
+
+        if (!length) {
+          // 传入的 selector 无效
+          return null;
+        }
+
+        var elem = _currentElem || this[0];
+
+        if (elem.nodeName === 'BODY') {
+          return null;
+        }
+
+        var parent = elem.parentElement;
+        var i;
+
+        for (i = 0; i < length; i++) {
+          if (parent === results[i]) {
+            // 找到，并返回
+            return $(parent);
+          }
+        } // 继续查找
+
+
+        return this.parentUntil(selector, parent);
+      } // 取消事件绑定
+
+    }, {
+      key: "off",
+      value: function off(type, fn) {
+        return this.forEach(function (elem) {
+          elem.removeEventListener(type, fn);
+        });
+      }
+    }, {
+      key: "equal",
+      value: function equal($elem) {
+        if ($elem.nodeType === 1) {
+          return this[0] === $elem;
+        } else {
+          return this[0] === $elem[0];
+        }
+      }
+    }, {
+      key: "isContain",
+      value: function isContain($child) {
+        var elem = this[0];
+        var child = $child[0];
+        return elem.contains(child);
       }
       /*
           css方法：
@@ -479,6 +544,19 @@
             elem.innerHTML = val;
           });
         }
+      } // 第一个
+
+    }, {
+      key: "first",
+      value: function first() {
+        return $(this.get(0));
+      } // 最后一个
+
+    }, {
+      key: "last",
+      value: function last() {
+        var length = this.length;
+        return $(this.get(length - 1));
       } // 获取 html
 
     }, {

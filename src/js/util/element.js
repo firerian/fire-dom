@@ -1,5 +1,8 @@
 import f from "../lib/exterior.js";
 // 记录所有的事件绑定
+// 
+// 
+// 
 const eventList = []
 class domFn{
     /*
@@ -159,17 +162,13 @@ class domFn{
     }
     
     append($children){
-        console.log($children)
         return this.forEach(elem =>{
                 $children.forEach(child => {
-                    console.log(child)
                     elem.appendChild(child)
                 })
         })
-     }
-
-
-     // 添加 class
+    }
+    // 添加 class
     addClass(className){
         if (!className) {
             return this
@@ -194,6 +193,53 @@ class domFn{
         })
     }
 
+     // parentUntil 找到符合 selector 的父节点
+    parentUntil(selector, _currentElem) {
+        const results = document.querySelectorAll(selector)
+        const length = results.length
+        if (!length) {
+            // 传入的 selector 无效
+            return null
+        }
+
+        const elem = _currentElem || this[0]
+        if (elem.nodeName === 'BODY') {
+            return null
+        }
+
+        const parent = elem.parentElement
+        let i
+        for (i = 0; i < length; i++) {
+            if (parent === results[i]) {
+                // 找到，并返回
+                return $(parent)
+            }
+        }
+
+        // 继续查找
+        return this.parentUntil(selector, parent)
+    }
+
+     // 取消事件绑定
+    off(type, fn){
+        return this.forEach(elem => {
+            elem.removeEventListener(type, fn)
+        })
+    }
+
+    equal($elem){
+        if ($elem.nodeType === 1) {
+            return this[0] === $elem
+        } else {
+            return this[0] === $elem[0]
+        }
+    }
+
+    isContain($child){
+        const elem = this[0]
+        const child = $child[0]
+        return elem.contains(child)
+    }
 
     /*
         css方法：
@@ -319,6 +365,16 @@ class domFn{
                 elem.innerHTML = val
             })
         }
+    }
+    // 第一个
+    first(){
+        return $(this.get(0))
+    }
+
+    // 最后一个
+    last(){
+        const length = this.length
+        return $(this.get(length - 1))
     }
 
     // 获取 html
